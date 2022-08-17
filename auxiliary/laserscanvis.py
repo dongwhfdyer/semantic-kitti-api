@@ -16,10 +16,10 @@ class LaserScanVis:
         self.scan = scan
         self.scan_names = scan_names
         self.label_names = label_names
-        self.offset = offset
+        self.offset = offset  # default is 0
         self.total = len(self.scan_names)
-        self.semantics = semantics
-        self.instances = instances
+        self.semantics = semantics  # default is False
+        self.instances = instances  # default is False
         # sanity check
         if not self.semantics and self.instances:
             print("Instances are only allowed in when semantics=True")
@@ -127,7 +127,7 @@ class LaserScanVis:
 
     def update_scan(self):
         # first open data
-        self.scan.open_scan(self.scan_names[self.offset])
+        self.scan.open_scan(self.scan_names[self.offset])  # default for offset is 0.
         if self.semantics:
             self.scan.open_label(self.label_names[self.offset])
             self.scan.colorize()

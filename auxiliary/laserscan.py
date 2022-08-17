@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
+import os
+import shutil
+from pathlib import Path
+
 import numpy as np
+import yaml
 
 
 class LaserScan:
@@ -279,5 +284,64 @@ class SemLaserScan(LaserScan):
         self.proj_inst_color[mask] = self.inst_color_lut[self.inst_label[self.proj_idx[mask]]]
 
 
+class REMOVE_DATA_WITH_MOVING_PREFIX_ON_LABEL():
+    def __init__(self):
+        self.data_path = Path(r"../dataset/kitti/sequences/00")
+        self.target_path = Path(r"../dataset/kitti/sequences/01")
+        self.data_label_path = self.data_path / "predictions"
+        self.data_points_path = self.data_path / "velodyne"
+        self.target_label_path = self.target_path / "predictions"
+        self.target_points_path = self.target_path / "velodyne"
+
+        self.delete_folders(self.target_label_path, self.target_points_path)
+        self.create_folders(self.target_label_path, self.target_points_path)
+
+        yaml_path = r"../config/semantic-kitti.yaml"
+        self.data_info = yaml.load(open(yaml_path, "r"))
+        self.left_data = [ind for ind in self.data_info['labels'].keys() if ind < 100]
+
+    def remove_main(self):
+        for label_file in self.data_label_path.glob("*.label"):
+            label_file_name = label_file.name
+            points_file = self.data_points_path / (label_file_name.replace(".label", ".bin"))
+
+            labels = np.fromfile(label_file, dtype=np.uint32)
+            points = np.fromfile(points_file, dtype=np.float32).reshape((-1, 4))
+
+            labels_ = labels.reshape(-1, 1)
+            labels_points = np.concatenate((points, labels_), axis=1)
+            labels_unique = np.unique(labels)
+            labels_points_cleaned = labels_points[labels_points[:, 4] < 100]
+            labels_cleaned = labels_points_cleaned[:, 4].astype(np.uint32)
+            points_cleaned = labels_points_cleaned[:, :4].astype(np.float32)
+            labels_cleaned.tofile(self.target_label_path / label_file_name)
+            points_cleaned.tofile(self.target_points_path / (label_file_name.replace(".label", ".bin")))
+
+            # print("--------------------------------------------------")
+
+    def delete_folders(self, *folder_path):
+        for folder in folder_path:
+            if os.path.exists(folder):
+                shutil.rmtree(folder)
+
+    def create_folders(self, *folders):
+        for folder in folders:
+            if not os.path.exists(folder):
+                os.makedirs(folder)
+
+
+def rubb_read_label(label_file):
+    # ls = LaserScan(project=True)
+    # ls.open_scan(r"../rubb/sequences/00/velodyne/000000.bin")
+    CFG = yaml.safe_load(open(r"../config/semantic-kitti.yaml", 'r'))
+    color_dict = CFG["color_map"]
+    nclasses = len(color_dict)
+    scan = SemLaserScan(nclasses, color_dict, project=True)
+    # scan.open_scan(r"../rubb/sequences/00/velodyne/000000.bin")
+
+    scan.open_label(r"../rubb/sequences/00/predictions/000000.label")
+
+
 if __name__ == '__main__':
-    LaserScan(project=True)
+    remove1 = REMOVE_DATA_WITH_MOVING_PREFIX_ON_LABEL()
+    remove1.remove_main()

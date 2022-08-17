@@ -8,11 +8,16 @@ from auxiliary.laserscan import LaserScan, SemLaserScan
 from auxiliary.laserscanvis import LaserScanVis
 
 if __name__ == '__main__':
+    # ---------kkuhn-block------------------------------ param settings
+    data_path = r"dataset\\kitti"
+    # sequence = "01"
+    sequence = "00"
+    # ---------kkuhn-block------------------------------
     parser = argparse.ArgumentParser("./visualize.py")
     parser.add_argument(
         '--dataset', '-d',
         type=str,
-        required=True,
+        default=data_path,
         help='Dataset to visualize. No Default',
     )
     parser.add_argument(
@@ -25,7 +30,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--sequence', '-s',
         type=str,
-        default="00",
+        default=sequence,
         required=False,
         help='Sequence to visualize. Defaults to %(default)s',
     )
@@ -118,8 +123,8 @@ if __name__ == '__main__':
             label_paths = os.path.join(FLAGS.predictions, "sequences",
                                        FLAGS.sequence, "predictions")
         else:
-            label_paths = os.path.join(FLAGS.dataset, "sequences",
-                                       FLAGS.sequence, "labels")
+            label_paths = os.path.join(FLAGS.dataset, "sequences", FLAGS.sequence, "predictions")
+            # label_paths = os.path.join(FLAGS.dataset, "sequences", FLAGS.sequence, "labels")
         if os.path.isdir(label_paths):
             print("Labels folder exists! Using labels from %s" % label_paths)
         else:

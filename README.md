@@ -1,3 +1,11 @@
+# Kuhn readme
+
+Run `visualize.py` directly, we can get the pointcloud.
+
+dataset is on my baidu cloud called `kitti_pointscloud_and_labels`.
+
+
+
 # API for SemanticKITTI
 
 This repository contains helper scripts to open, visualize, process, and 
@@ -61,15 +69,15 @@ The data is organized in the following format:
 - From [KITTI Odometry](http://www.cvlibs.net/datasets/kitti/eval_odometry.php): 
   - `image_2` and `image_3` correspond to the rgb images for each sequence.
   - `velodyne` contains the pointclouds for each scan in each sequence. Each 
-`.bin` scan is a list of float32 points in [x,y,z,remission] format. See
-[laserscan.py](auxiliary/laserscan.py) to see how the points are read.
+  `.bin` scan is a list of float32 points in [x,y,z,remission] format. See
+  [laserscan.py](auxiliary/laserscan.py) to see how the points are read.
 - From SemanticKITTI:
   - `labels` contains the labels for each scan in each sequence. Each `.label` 
-file contains a uint32 label for each point in the corresponding `.bin` scan.
-See [laserscan.py](auxiliary/laserscan.py) to see how the labels are read.
+  file contains a uint32 label for each point in the corresponding `.bin` scan.
+  See [laserscan.py](auxiliary/laserscan.py) to see how the labels are read.
   - `poses.txt` contain the manually looped-closed poses for each capture (in
-the camera frame) that were used in the annotation tools to aggregate all
-the point clouds.
+  the camera frame) that were used in the annotation tools to aggregate all
+  the point clouds.
   - `voxels` contains all information needed for the task of semantic scene completion. Each `.bin` file contains for each voxel if that voxel is occupied by laser measurements in a packed binary format. This is the input to the semantic scene completion task and it corresponds to the voxelization of a single LiDAR scan. Each`.label` file contains for each voxel of the completed scene a label in binary format. The label is a 16-bit unsigned integer (aka uint16_t) for each voxel. `.invalid` and `.occluded` contain information about the occlusion of voxel. Invalid voxels are voxels that are occluded from each view position and occluded voxels are occluded in the first view point. See also [SSCDataset.py](auxiliary/SSCDataset.py) for more information on loading the data.
 
 The main configuration file for the data is in `config/semantic-kitti.yaml`. In this file you will find:
@@ -81,12 +89,12 @@ the number of total points in the dataset. This can be obtained by running the
 [./content.py](./content.py) script, and is used to calculate the weights for the cross
 entropy in all baseline methods (in order handle class imbalance).
 - `learning_map`: dictionary which maps each class label to its cross entropy
-equivalent, for learning. This is done to mask undesired classes, map different
-classes together, and because the cross entropy expects a value in
-[0, numclasses - 1]. We also provide [./remap_semantic_labels.py](./remap_semantic_labels.py),
-a script that uses this dictionary to put the label files in the cross entropy format,
-so that you can use the labels directly in your training pipeline.
-Examples:
+  equivalent, for learning. This is done to mask undesired classes, map different
+  classes together, and because the cross entropy expects a value in
+  [0, numclasses - 1]. We also provide [./remap_semantic_labels.py](./remap_semantic_labels.py),
+  a script that uses this dictionary to put the label files in the cross entropy format,
+  so that you can use the labels directly in your training pipeline.
+  Examples:
   ```yaml
     0 : 0     # "unlabeled"
     1 : 0     # "outlier" to "unlabeled" -> gets ignored in training, with unlabeled
@@ -237,19 +245,19 @@ The data needs to be either:
 
     ```sh
   $ ./evaluate_completion.py --dataset /path/to/kitti/dataset/ --predictions /path/to/method_predictions --split train/valid/test # depending of desired split to evaluate
-  ```
+    ```
 
   or 
 
     ```sh
   $ ./evaluate_panoptic.py --dataset /path/to/kitti/dataset/ --predictions /path/to/method_predictions --split train/valid/test # depending of desired split to evaluate
-  ```
+    ```
 
   or for moving object segmentation
 
     ```sh
   $ ./evaluate_mos.py --dataset /path/to/kitti/dataset/ --predictions /path/to/method_predictions --split train/valid/test # depending of desired split to evaluate
-  ```  
+    ```
 
 - In the same directory as the dataset
 
